@@ -1,0 +1,128 @@
+1.
+npm i redux react-deux redux-thunk
+
+/// PROVIDER
+2.0 app.js
+import { Provider } from 'react-redux';
+2.1 app.js
+return (
+      <Provider store={store}>
+2.2 app.js
+import { createStore, applyMiddleware } from 'redux';
+... const store = createStore(() => [], {}, applyMiddleware());
+2.3 app.js
+import store from './store';
+
+/// STORE
+3.0 store.js
+import { createStore, applyMiddleware } from 'redux';
+const store = createStore(() => [], {}, applyMiddleware());
+export default store;
+
+/// THUNK
+4.0 store.js
+import thunk from 'redux-thunk';
+const middleware = [thunk];
+const store = createStore(() => [], {}, applyMiddleware(...middleware));
+
+/// REDUCERS
+5.0 /src/reducers/index.js - root reducer
+import { combineReducers } from 'redux';
+export default combineReducers(
+
+5.1 authReducer.js
+const initialState = {
+    isAuthenticated: false,
+    user: {}
+}
+export default function(state = initialState, action) {
+    switch(action.type) {
+        default:
+            return state;
+    }
+}
+5.1 index.js
+import authReducer from './authReducer';
+export default combineReducers({ auth: authReducer});
+
+5.2 store.js
+import rootReducer from './reducers';
+const store = createStore(rootReducer, {}, applyMiddleware(...middleware));
+const initialState = {};
+const store = createStore(rootReducer, initialState, applyMiddleware(...middleware));
+
+/// COMPOSE
+6.0 store.js
+import { createStore, applyMiddleware, compose } from 'redux';
+onst store = createStore(
+  rootReducer,
+  initialState,
+  compose(
+      applyMiddleware(...middleware), 
+      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    )
+);
+
+/// ACTIONS
+7.0 /actions/authActions.js
+import { TEST_DISPATCH } from './types';
+// Register User
+export const registeruser = userData => {
+  return {
+    type: TEST_DISPATCH,
+    payload: userData
+  };
+};
+7.1 /actions/types.js
+export const TEST_DISPATCH = 'TEST_DISPATCH';
+7.2 authReducer.js
+import { TEST_DISPATCH } from '../actions/types';
+case TEST_DISPATCH:
+      return {
+        ...state,
+        user: action.payload
+        // the 'user:{}' is filled with data
+        // from 'payload: userData' from 'authActions.js'
+      };
+
+/// USE REDUX IN A COMPONENT
+8.0 /components/auth/Register.js
+import { connect } from 'react-redux';
+import { registerUser} from '../../actions/authActions';
+export default connect(null, { registerUser })(Register);
+onSubmit(e) { ...
+    this.props.registerUser(newUser); ...
+const mapStateToProps = state => ({
+  auth: state.auth // comes from root reducer
+});
+export default connect(
+  mapStateToProps,
+  { registerUser }
+)(Register);
+
+/// PROP TYPES
+9.0 register.js
+import PropTypes from 'prop-types';
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired
+}
+
+/// ASYNC DISPATCH
+10.0 authActions.js
+import { GET_ERRORS } from './types';
+import axios from 'axios';
+import backend from '../backend/backend';
+import { GET_ERRORS } from '../../../../mern/devconnector/client/src/actions/types';
+// Register User
+export const registerUser = userData => dispatch => {
+  axios
+    .post(`${backend}/api/users/register`, userData)
+    .then(res => console.log(res.data))
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+};
