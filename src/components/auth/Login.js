@@ -27,11 +27,11 @@ class Login extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.auth.isAuthenticated) {
-      this.loading = false;
+      this.loading = true;
       this.props.history.push('/dashboard');
     }
     if (nextProps.errors) {
-      this.loading = false;
+      this.loading = true;
       this.setState({ errors: nextProps.errors });
     }
   }

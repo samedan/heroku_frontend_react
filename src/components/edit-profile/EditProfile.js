@@ -79,6 +79,7 @@ class CreateProfile extends Component {
         handle: profile.handle,
         company: profile.company,
         website: profile.website,
+        bio: profile.bio,
         location: profile.location,
         status: profile.status,
         skills: skillsCSV,
